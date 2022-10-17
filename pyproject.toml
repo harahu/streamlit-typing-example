@@ -5,7 +5,7 @@ description = "Code examples for streamlit + mypy"
 authors = ["Harald Husum <harald.husum@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "streamlit_typing_example"}]
+packages = [{include = "examples"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"

@@ -1,9 +1,15 @@
 import sys
 import tempfile
 from importlib.metadata import version
+from typing import Final
 
 import streamlit as st
 from mypy import api as mypy_api
+
+APP_TITLE: Final = "Streamlit Typing Playground"
+
+NOTE_CUE: Final = "note"
+ERROR_CUE: Final = "error"
 
 
 def type_check(source: str) -> tuple[str, str, int]:
@@ -47,11 +53,9 @@ def type_check(source: str) -> tuple[str, str, int]:
 
 def render_buffer(buffer: list[str], kind: str, n: str) -> list[str]:
     if buffer:
-        render_fn = st.info if kind == "note" else st.error
-
-        buffer_text = f"Line {n}:  \n"
-        buffer_text = buffer_text + "  \n".join(
-            [f"- {l.removeprefix(f'{n}:')}" for l in buffer]
+        render_fn = st.info if kind == NOTE_CUE else st.error
+        buffer_text = f"Line {n}:  \n" + "  \n".join(
+            [f"- {line.removeprefix(f'{n}:')}" for line in buffer]
         )
         if buffer_text:
             render_fn(buffer_text)
@@ -59,24 +63,28 @@ def render_buffer(buffer: list[str], kind: str, n: str) -> list[str]:
     return []
 
 
+def maybe_render_report_header(last_line: str) -> bool:
+    if last_line.startswith("Success"):
+        st.success(body=last_line, icon="🥳")
+        return True
+    elif last_line.startswith("Found"):
+        st.error(body=last_line, icon="🚫")
+        return True
+    return False
+
+
 def render_normal_report(report: str) -> None:
     lines = report.splitlines()
 
     if lines:
-        last_line = lines[-1]
-
-        if last_line.startswith("Success"):
-            st.success(body=last_line, icon="🥳")
-            lines = lines[:-1]
-        elif last_line.startswith("Found"):
-            st.error(body=last_line, icon="🚫")
+        if maybe_render_report_header(last_line=lines[-1]):
             lines = lines[:-1]
 
         buffer: list[str] = []
         last_line_number = "-1"
         last_line_kind = ""
         for line in lines:
-            kind = "note" if "note: " in line else "error"
+            kind = "note" if f"{NOTE_CUE}: " in line else "error"
             line_number = line.split(":")[0]
 
             if last_line_number != line_number or last_line_kind != kind:
@@ -88,8 +96,12 @@ def render_normal_report(report: str) -> None:
         render_buffer(buffer, last_line_kind, last_line_number)
 
 
+def python_version() -> str:
+    return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+
+
 def render_documentation() -> None:
-    st.sidebar.title("Streamlit Typing Playground")
+    st.sidebar.title(APP_TITLE)
     st.sidebar.write(
         "A tool for quickly checking how mypy evaluates snippets of streamlit "
         "code, without having to install mypy.  \n\n"
@@ -98,9 +110,9 @@ def render_documentation() -> None:
     )
 
     st.sidebar.caption(
-        "python"
-        f" v{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} "
-        f" \nmypy v{version('mypy')}  \nstreamlit v{version('streamlit')}",
+        f"python v{python_version()}  \n"
+        f"mypy v{version('mypy')}  \n"
+        f"streamlit v{version('streamlit')}",
     )
 
 

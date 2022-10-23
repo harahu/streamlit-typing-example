@@ -34,8 +34,10 @@ def type_check(source: str) -> tuple[str, str, int]:
 
     """
     with tempfile.TemporaryDirectory() as tmpdir_name:
-        with open(f"{tmpdir_name}/_source.py", "w") as f:
-            f.write(source)
+        with open(
+            file=f"{tmpdir_name}/_source.py", mode="w", encoding="utf-8"
+        ) as source_file:
+            source_file.write(source)
 
         normal_report, error_report, exit_status = mypy_api.run(
             [f"{tmpdir_name}/_source.py"]
@@ -51,11 +53,11 @@ def type_check(source: str) -> tuple[str, str, int]:
     return normal_report, error_report, exit_status
 
 
-def render_buffer(buffer: list[str], kind: str, n: str) -> list[str]:
+def render_buffer(buffer: list[str], kind: str, source_line_number: str) -> list[str]:
     if buffer:
         render_fn = st.info if kind == NOTE_CUE else st.error
-        buffer_text = f"Line {n}:  \n" + "  \n".join(
-            [f"- {line.removeprefix(f'{n}:')}" for line in buffer]
+        buffer_text = f"Line {source_line_number}:  \n" + "  \n".join(
+            [f"- {line.removeprefix(f'{source_line_number}:')}" for line in buffer]
         )
         if buffer_text:
             render_fn(buffer_text)
@@ -67,7 +69,7 @@ def maybe_render_report_header(last_line: str) -> bool:
     if last_line.startswith("Success"):
         st.success(body=last_line, icon="🥳")
         return True
-    elif last_line.startswith("Found"):
+    if last_line.startswith("Found"):
         st.error(body=last_line, icon="🚫")
         return True
     return False
@@ -123,7 +125,7 @@ def prompt_for_source() -> str:
         height=500,
         max_chars=1000,
         placeholder="""Please paste some streamlit-related code into this textbox. E.g.:
-    
+
 import streamlit as st
 
 option = st.select_slider(
@@ -140,7 +142,7 @@ reveal_type(option)
 
 def generate_and_render_report(source: str) -> None:
     with st.spinner(text="🔍 Digging in to those types..."):
-        normal_report, error_report, exit_status = type_check(source=source)
+        normal_report, _, _ = type_check(source=source)
         render_normal_report(normal_report)
 
 

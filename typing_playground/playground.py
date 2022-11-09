@@ -5,6 +5,7 @@ from typing import Final
 
 import streamlit as st
 from mypy import api as mypy_api
+from streamlit_ace import st_ace
 
 APP_TITLE: Final = "Streamlit Typing Playground"
 
@@ -119,11 +120,9 @@ def render_documentation() -> None:
 
 
 def prompt_for_source() -> str:
-    source = st.text_area(
-        label="Python Source Code",
-        label_visibility="collapsed",
+    source: str = st_ace(
+        language="python",
         height=500,
-        max_chars=1000,
         placeholder="""Please paste some streamlit-related code into this textbox. E.g.:
 
 import streamlit as st
@@ -135,6 +134,7 @@ option = st.select_slider(
 
 reveal_type(option)
         """,
+        auto_update=True,
     )
 
     return source

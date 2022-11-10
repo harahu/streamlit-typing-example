@@ -1,8 +1,7 @@
 import streamlit  # noqa: F401
 from pytest_mock import MockerFixture
 
-from typing_playground.playground import (main, maybe_render_report_header,
-                                          type_check)
+from typing_playground.playground import main, maybe_render_report_header, type_check
 
 
 class TestTypeCheck:
@@ -26,14 +25,14 @@ class TestTypeCheck:
             "Success: no issues found in 1 source file"
         )
         assert e == ""
-        assert c == 1
+        assert c == 0
 
     def test_illegal(self) -> None:
         n, e, c = type_check(source="foo: int = None")
         assert (
             n
             == '1: error: Incompatible types in assignment (expression has type "None",'
-            ' variable has type "int")\nFound 1 error'
+            ' variable has type "int")  [assignment]\nFound 1 error'
         )
         assert e == ""
         assert c == 1
@@ -43,7 +42,7 @@ class TestTypeCheck:
         assert (
             n
             == '1: error: Incompatible types in assignment (expression has type "int",'
-            ' variable has type "str")\n2: note: Revealed type is'
+            ' variable has type "str")  [assignment]\n2: note: Revealed type is'
             ' "builtins.str"\nFound 1 error'
         )
         assert e == ""

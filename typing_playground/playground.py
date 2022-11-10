@@ -146,13 +146,30 @@ def generate_and_render_report(source: str) -> None:
         render_normal_report(normal_report)
 
 
+def typecheck_button(source: str) -> bool:
+    button_help = "Let mypy type-check your code"
+    button_disabled = False
+
+    if not source:
+        button_help = "You need to provide some source code to type check first"
+        button_disabled = True
+
+    elif len(source) > 2000:
+        button_help = "Please limit yourself to less than 2000 characters"
+        button_disabled = True
+
+    return st.button(
+        label="Type-check with mypy",
+        help=button_help,
+        disabled=button_disabled,
+        type="primary",
+    )
+
+
 def offer_type_checking() -> None:
     source = prompt_for_source()
-    if st.button(
-        label="Type-check with mypy",
-        disabled=not source,
-        type="primary",
-    ):
+
+    if typecheck_button(source=source):
         generate_and_render_report(source=source)
 
 

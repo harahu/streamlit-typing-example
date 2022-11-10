@@ -123,6 +123,7 @@ def prompt_for_source() -> str:
     source: str = st_ace(
         language="python",
         theme="tomorrow_night_eighties",
+        height=500,
         placeholder="""Please paste some streamlit-related code into this textbox. E.g.:
 
 import streamlit as st

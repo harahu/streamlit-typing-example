@@ -151,6 +151,7 @@ def offer_type_checking() -> None:
     if st.button(
         label="Type-check with mypy",
         disabled=not source,
+        type="primary",
     ):
         generate_and_render_report(source=source)
 

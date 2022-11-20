@@ -12,8 +12,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "~3.10"
-streamlit = "^1.14.0"
-mypy = "^0.990"
+streamlit = "^1.15.0"
+mypy = "^0.991"
 pandas-stubs = "^1.5.1.221024"
 streamlit-ace = "^0.1.1"
 watchdog = "^2.1.9"  # Improves streamlit performance
